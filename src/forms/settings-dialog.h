@@ -31,10 +31,8 @@ public:
 	~SettingsDialog();
 	void showEvent(QShowEvent* event);
 	void ToggleShowHide();
-	void PreparePasswordEntry();
 
 private Q_SLOTS:
-	void AuthCheckboxChanged();
 	void FormAccepted();
 
 private:
