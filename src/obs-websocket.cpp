@@ -42,7 +42,7 @@ void ___data_item_release(obs_data_item_t* dataItem) {
 }
 
 OBS_DECLARE_MODULE()
-OBS_MODULE_USE_DEFAULT_LOCALE("obs-websocket", "en-US")
+OBS_MODULE_USE_DEFAULT_LOCALE("loupedeck-obs", "en-US")
 
 ConfigPtr _config;
 WSServerPtr _server;
@@ -68,8 +68,7 @@ bool obs_module_load(void) {
 	settingsDialog = new SettingsDialog(mainWindow);
 	obs_frontend_pop_ui_translation();
 
-	const char* menuActionText =
-		obs_module_text("OBSWebsocket.Settings.DialogTitle");
+	const char* menuActionText = obs_module_text("LoupedeckConnector.Settings.DialogTitle");
 	QAction* menuAction =
 		(QAction*)obs_frontend_add_tools_menu_qaction(menuActionText);
 	QObject::connect(menuAction, &QAction::triggered, [] {
@@ -119,7 +118,6 @@ WSEventsPtr GetEventsSystem() {
 
 void ShowPasswordSetting() {
 	if (settingsDialog) {
-		settingsDialog->PreparePasswordEntry();
 		settingsDialog->setVisible(true);
 	}
 }
