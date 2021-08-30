@@ -35,29 +35,12 @@ SettingsDialog::SettingsDialog(QWidget* parent) :
 {
 	ui->setupUi(this);
 
-	connect(ui->authRequired, &QCheckBox::stateChanged,
-		this, &SettingsDialog::AuthCheckboxChanged);
 	connect(ui->buttonBox, &QDialogButtonBox::accepted,
 		this, &SettingsDialog::FormAccepted);
 }
 
 void SettingsDialog::showEvent(QShowEvent* event) {
-	auto conf = GetConfig();
-	if (conf) {
-		ui->serverEnabled->setChecked(conf->ServerEnabled);
-		ui->serverPort->setValue(conf->ServerPort);
-		ui->lockToIPv4->setChecked(conf->LockToIPv4);
 
-		ui->debugEnabled->setChecked(conf->DebugEnabled);
-		ui->alertsEnabled->setChecked(conf->AlertsEnabled);
-
-		ui->authRequired->blockSignals(true);
-		ui->authRequired->setChecked(conf->AuthRequired);
-		ui->authRequired->blockSignals(false);
-	}
-
-	ui->password->setText(CHANGE_ME);
-	ui->password->setEnabled(ui->authRequired->isChecked());
 }
 
 void SettingsDialog::ToggleShowHide() {
@@ -67,68 +50,8 @@ void SettingsDialog::ToggleShowHide() {
 		setVisible(false);
 }
 
-void SettingsDialog::PreparePasswordEntry() {
-	ui->authRequired->blockSignals(true);
-	ui->authRequired->setChecked(true);
-	ui->authRequired->blockSignals(false);
-	ui->password->setEnabled(true);
-	ui->password->setFocus();
-}
-
-void SettingsDialog::AuthCheckboxChanged() {
-	if (ui->authRequired->isChecked()) {
-		ui->password->setEnabled(true);
-	}
-	else {
-		obs_frontend_push_ui_translation(obs_module_get_string);
-		QString authDisabledWarning = QObject::tr("OBSWebsocket.Settings.AuthDisabledWarning");
-		obs_frontend_pop_ui_translation();
-
-		QMessageBox::StandardButton response = QMessageBox::question(this, "obs-websocket", authDisabledWarning);
-		if (response == QMessageBox::Yes) {
-			ui->password->setEnabled(false);
-		} else {
-			ui->authRequired->setChecked(true);
-		}
-	}
-}
-
 void SettingsDialog::FormAccepted() {
-	auto conf = GetConfig();
-	if (!conf) {
-		return;
-	}
 
-	conf->ServerEnabled = ui->serverEnabled->isChecked();
-	conf->ServerPort = ui->serverPort->value();
-	conf->LockToIPv4 = ui->lockToIPv4->isChecked();
-
-	conf->DebugEnabled = ui->debugEnabled->isChecked();
-	conf->AlertsEnabled = ui->alertsEnabled->isChecked();
-
-	if (ui->authRequired->isChecked()) {
-		if (ui->password->text() != CHANGE_ME) {
-			conf->SetPassword(ui->password->text());
-		}
-
-		if (!conf->Secret.isEmpty())
-			conf->AuthRequired = true;
-		else
-			conf->AuthRequired = false;
-	}
-	else
-	{
-		conf->AuthRequired = false;
-	}
-
-	conf->Save();
-
-	auto server = GetServer();
-	if (conf->ServerEnabled) {
-		server->start(conf->ServerPort, conf->LockToIPv4);
-	} else {
-		server->stop();
-	}
 }
 
 SettingsDialog::~SettingsDialog() {
