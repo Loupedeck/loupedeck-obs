@@ -105,8 +105,11 @@ void WSServer::start(quint16 port, bool lockToIPv4)
 		blog(LOG_INFO, "server: listen failed: %s", errorCodeMessage.c_str());
 
 		obs_frontend_push_ui_translation(obs_module_get_string);
-		QString errorTitle = tr("OBSWebsocket.Server.StartFailed.Title");
-		QString errorMessage = tr("OBSWebsocket.Server.StartFailed.Message").arg(_serverPort).arg(errorCodeMessage.c_str());
+		QString errorTitle = "Loupedeck Connector failure"; /* tr("OBSWebsocket.Server.StartFailed.Title");*/
+        	QString errorMessage = QString("Loupedeck Connector failed to start.\n"
+					       "Please check https://support.loupedeck.com for possible solutions\n"
+					       "The error message is: %2").arg(errorCodeMessage.c_str());
+      				      /*tr("OBSWebsocket.Server.StartFailed.Message").arg(_serverPort).arg(errorCodeMessage.c_str());*/
 		obs_frontend_pop_ui_translation();
 
 		QMainWindow* mainWindow = reinterpret_cast<QMainWindow*>(obs_frontend_get_main_window());
@@ -263,9 +266,10 @@ QString WSServer::getRemoteEndpoint(connection_hdl hdl)
 
 void WSServer::notifyConnection(QString clientIp)
 {
+	//AL: TODO: Store connection status/data somewhere to be shown  from the settings dialog
 	obs_frontend_push_ui_translation(obs_module_get_string);
-	QString title = tr("OBSWebsocket.NotifyConnect.Title");
-	QString msg = tr("OBSWebsocket.NotifyConnect.Message").arg(clientIp);
+	QString title = "Loupedeck Connector"; /*tr("OBSWebsocket.NotifyConnect.Title");*/
+	QString msg = "Loupedeck connected"; /*tr("OBSWebsocket.NotifyConnect.Message").arg(clientIp);*/
 	obs_frontend_pop_ui_translation();
 
 	Utils::SysTrayNotify(msg, QSystemTrayIcon::Information, title);
@@ -274,8 +278,8 @@ void WSServer::notifyConnection(QString clientIp)
 void WSServer::notifyDisconnection(QString clientIp)
 {
 	obs_frontend_push_ui_translation(obs_module_get_string);
-	QString title = tr("OBSWebsocket.NotifyDisconnect.Title");
-	QString msg = tr("OBSWebsocket.NotifyDisconnect.Message").arg(clientIp);
+	QString title = "Loupedeck Connector";  /*tr("OBSWebsocket.NotifyDisconnect.Title");*/
+	QString msg = "Loupedeck disconnected"; /*tr("OBSWebsocket.NotifyDisconnect.Message").arg(clientIp);*/
 	obs_frontend_pop_ui_translation();
 
 	Utils::SysTrayNotify(msg, QSystemTrayIcon::Information, title);

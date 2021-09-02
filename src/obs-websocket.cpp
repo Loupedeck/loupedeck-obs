@@ -68,7 +68,7 @@ bool obs_module_load(void) {
 	settingsDialog = new SettingsDialog(mainWindow);
 	obs_frontend_pop_ui_translation();
 
-	const char* menuActionText = obs_module_text("LoupedeckConnector.Settings.DialogTitle");
+	const char* menuActionText = "Loupedeck Connector";
 	QAction* menuAction =
 		(QAction*)obs_frontend_add_tools_menu_qaction(menuActionText);
 	QObject::connect(menuAction, &QAction::triggered, [] {

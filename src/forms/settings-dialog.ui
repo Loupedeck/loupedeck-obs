@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>LoupedeckConnector.Settings.DialogTitle</string>
+   <string>Loupedeck Connector</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
@@ -31,7 +31,7 @@
      <item>
       <widget class="QLabel" name="lblCentral">
        <property name="text">
-        <string>LoupedeckConnector.Settings.DialogText</string>
+        <string>Loupedeck Connector based on obs-websocket</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
