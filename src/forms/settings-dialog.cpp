@@ -40,7 +40,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) :
 }
 
 void SettingsDialog::showEvent(QShowEvent* event) {
-
+	//TODO: Show the connection status here
 }
 
 void SettingsDialog::ToggleShowHide() {
