@@ -27,12 +27,7 @@ class Config {
 	public:
 		Config();
 		~Config();
-		void Load();
-		void Save();
-		void SetDefaults();
 		config_t* GetConfigStore();
-
-		void MigrateFromGlobalSettings();
 
 		void SetPassword(QString password);
 		bool CheckAuth(QString userChallenge);
@@ -53,7 +48,4 @@ class Config {
 		QString SessionChallenge;
 		bool SettingsLoaded;
 
-	private:
-		static void OnFrontendEvent(enum obs_frontend_event event, void* param);
-		static void FirstRunPasswordSetup();
 };
