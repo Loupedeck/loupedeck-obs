@@ -4,6 +4,3 @@
 [submodule "deps/asio"]
 	path = deps/asio
 	url = https://github.com/chriskohlhoff/asio.git
-[submodule "deps/deps/asio"]
-	path = deps/deps/asio
-	url = https://github.com/chriskohlhoff/asio.git
