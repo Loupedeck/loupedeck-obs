@@ -56,8 +56,6 @@ bool obs_module_load(void) {
 
 	// Core setup
 	_config = ConfigPtr(new Config());
-	_config->MigrateFromGlobalSettings(); // TODO remove this on the next minor jump
-	_config->Load();
 
 	_server = WSServerPtr(new WSServer());
 	_eventsSystem = WSEventsPtr(new WSEvents(_server));
