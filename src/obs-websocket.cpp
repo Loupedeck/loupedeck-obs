@@ -96,7 +96,7 @@ std::string get_loupedeck_file_path()
 	}
 	
 	if (dataFilePath.length() == 0)
-		throw std::exception("Cannot get %LOCALAPPDATA% path");
+		throw std::runtime_error("Cannot get %LOCALAPPDATA% path");
 
 	dataFilePath = dataFilePath + "\\Loupedeck\\PluginData\\OBSStudio\\";
 
@@ -117,7 +117,7 @@ void save_to_loupedeck(unsigned short port)
 		blog(LOG_INFO, "Will save to file %s", fname.c_str());
 		if (!df.is_open())
 		{
-			throw std::exception("Cannot share port with Loupedeck, see OBS log for details");
+			throw std::runtime_error("Cannot share port with Loupedeck, see OBS log for details");
 		}
 		df << port;
 
