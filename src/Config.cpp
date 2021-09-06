@@ -46,7 +46,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #define QT_TO_UTF8(str) str.toUtf8().constData()
 
 Config::Config() :
-	ServerEnabled(true),
 	ServerPort(56873 /*loupe*/),
 	LockToIPv4(false),
 	DebugEnabled(false),
@@ -58,7 +57,6 @@ Config::Config() :
 {
 	qsrand(QTime::currentTime().msec());
 
-	ServerEnabled = true;
 	ServerPort = 56873; /*loupe*/
 	LockToIPv4 = true;
 
