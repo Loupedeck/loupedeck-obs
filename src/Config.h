@@ -35,7 +35,6 @@ class Config {
 		static QString GenerateSecret(
 				QString password, QString salt);
 
-		bool ServerEnabled;
 		uint64_t ServerPort;
 		bool LockToIPv4;
 

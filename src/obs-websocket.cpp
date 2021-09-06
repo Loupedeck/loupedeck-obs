@@ -30,6 +30,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "Config.h"
 #include "forms/settings-dialog.h"
 
+#include <iostream>
+#include <fstream>
+
+
 void ___source_dummy_addref(obs_source_t*) {}
 void ___sceneitem_dummy_addref(obs_sceneitem_t*) {}
 void ___data_dummy_addref(obs_data_t*) {}
@@ -48,6 +52,83 @@ ConfigPtr _config;
 WSServerPtr _server;
 WSEventsPtr _eventsSystem;
 SettingsDialog* settingsDialog = nullptr;
+
+unsigned short get_free_port()
+{
+	/* https://stackoverflow.com/a/19923459 */
+	asio::io_service service;
+	asio::ip::tcp::acceptor acceptor(service);
+	unsigned short port(0);
+	asio::ip::tcp::endpoint endPoint(asio::ip::tcp::endpoint(asio::ip::tcp::v6(), port));
+	acceptor.open(endPoint.protocol());
+	acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
+	acceptor.bind(endPoint);
+
+	acceptor.listen();
+
+	asio::ip::tcp::endpoint le = acceptor.local_endpoint(); 
+	port = le.port();
+
+	blog(LOG_INFO, "using port %d",port);
+
+	return port;
+}
+
+#define PORT_FILE "websocket.port"
+
+//Windows - specific
+std::string get_loupedeck_file_path()
+{
+
+	std::string dataFilePath = "";
+
+#ifndef WIN32
+	/*For non-windows (=Mac in our case)*/
+	dataFilePath = "~/local/share/Loupedeck/PluginData/";
+#else
+	/* %LOCALAPPDATA%\Loupedeck\PluginData\OBSStudio  */
+	char* buf = nullptr;
+	size_t sz = 0;
+	if (_dupenv_s(&buf, &sz, "LOCALAPPDATA") == 0 && buf != nullptr)
+	{
+		dataFilePath = buf;
+		free(buf);
+	}
+	
+	if (dataFilePath.length() == 0)
+		throw std::exception("Cannot get %LOCALAPPDATA% path");
+
+	dataFilePath = dataFilePath + "\\Loupedeck\\PluginData\\OBSStudio\\";
+
+#endif
+
+	dataFilePath += PORT_FILE;
+
+	return dataFilePath;
+}
+
+void save_to_loupedeck(unsigned short port)
+{
+	try {
+		//Note this thing can throw; 
+		std::string fname = get_loupedeck_file_path().c_str();
+		std::ofstream df(fname, std::ofstream::out);
+
+		blog(LOG_INFO, "Will save to file %s", fname.c_str());
+		if (!df.is_open())
+		{
+			throw std::exception("Cannot share port with Loupedeck, see OBS log for details");
+		}
+		df << port;
+
+		df.close();
+	}
+	catch ( std::exception &ex ) {
+		blog(LOG_ERROR, "Cannot save Loupedeck port to file! Exception: %s", ex.what());
+	}
+	
+}
+
 
 bool obs_module_load(void) {
 	blog(LOG_INFO, "you can haz websockets (version %s)", OBS_WEBSOCKET_VERSION);
@@ -78,9 +159,9 @@ bool obs_module_load(void) {
 	// Setup event handler to start the server once OBS is ready
 	auto eventCallback = [](enum obs_frontend_event event, void *param) {
 		if (event == OBS_FRONTEND_EVENT_FINISHED_LOADING) {
-			if (_config->ServerEnabled) {
-				_server->start(_config->ServerPort, _config->LockToIPv4);
-			}
+			_config->ServerPort = get_free_port();
+			save_to_loupedeck(_config->ServerPort);
+			_server->start(_config->ServerPort, _config->LockToIPv4);
 			obs_frontend_remove_event_callback((obs_frontend_event_cb)param, nullptr);
 		}
 	};

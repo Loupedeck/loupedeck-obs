@@ -107,8 +107,8 @@ void WSServer::start(quint16 port, bool lockToIPv4)
 		obs_frontend_push_ui_translation(obs_module_get_string);
 		QString errorTitle = "Loupedeck Connector failure"; /* tr("OBSWebsocket.Server.StartFailed.Title");*/
         	QString errorMessage = QString("Loupedeck Connector failed to start.\n"
-					       "Please check https://support.loupedeck.com for possible solutions\n"
-					       "The error message is: %2").arg(errorCodeMessage.c_str());
+					       "Please check https://support.loupedeck.com for possible solution\n"
+					       "The error message: \"%2\"").arg(errorCodeMessage.c_str());
       				      /*tr("OBSWebsocket.Server.StartFailed.Message").arg(_serverPort).arg(errorCodeMessage.c_str());*/
 		obs_frontend_pop_ui_translation();
 
