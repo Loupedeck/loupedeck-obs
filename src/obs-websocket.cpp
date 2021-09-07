@@ -84,7 +84,7 @@ std::string get_loupedeck_file_path()
 
 #ifndef WIN32
 	/*For non-windows (=Mac in our case)*/
-	dataFilePath = "~/local/share/Loupedeck/PluginData/";
+	dataFilePath = "~/.local/share/Loupedeck/PluginData/OBSStudio/";
 #else
 	/* %LOCALAPPDATA%\Loupedeck\PluginData\OBSStudio  */
 	char* buf = nullptr;
