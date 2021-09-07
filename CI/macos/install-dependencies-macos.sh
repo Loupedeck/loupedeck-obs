@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# From Azure-pipelines.yml
+OBS_DEPS_VERSION=2020-12-22
+QT_VERSION=5.15.2
+
+
 OSTYPE=$(uname)
 
 if [ "${OSTYPE}" != "Darwin" ]; then
