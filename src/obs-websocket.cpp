@@ -74,34 +74,32 @@ unsigned short get_free_port()
 	return port;
 }
 
+#ifndef WIN32
+	#define ENV_PREFIX "HOME"
+	#define ENV_PATH "/.local/share/Loupedeck/PluginData/OBSStudio/"
+#else 
+	#define ENV_PREFIX "LOCALAPPDATA"
+	#define ENV_PATH "\\Loupedeck\\PluginData\\OBSStudio\\"
+#endif
+
 #define PORT_FILE "websocket.port"
 
-//Windows - specific
 std::string get_loupedeck_file_path()
 {
-
 	std::string dataFilePath = "";
-
-#ifndef WIN32
-	/*For non-windows (=Mac in our case)*/
-	dataFilePath = "~/.local/share/Loupedeck/PluginData/OBSStudio/";
-#else
-	/* %LOCALAPPDATA%\Loupedeck\PluginData\OBSStudio  */
 	char* buf = nullptr;
 	size_t sz = 0;
-	if (_dupenv_s(&buf, &sz, "LOCALAPPDATA") == 0 && buf != nullptr)
+
+	if (_dupenv_s(&buf, &sz, ENV_PREFIX) == 0 && buf != nullptr)
 	{
 		dataFilePath = buf;
 		free(buf);
 	}
 	
 	if (dataFilePath.length() == 0)
-		throw std::runtime_error("Cannot get %LOCALAPPDATA% path");
+		throw std::runtime_error("Cannot get home directory path");
 
-	dataFilePath = dataFilePath + "\\Loupedeck\\PluginData\\OBSStudio\\";
-
-#endif
-
+	dataFilePath += ENV_PATH;
 	dataFilePath += PORT_FILE;
 
 	return dataFilePath;
