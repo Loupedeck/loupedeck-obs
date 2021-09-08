@@ -86,16 +86,8 @@ unsigned short get_free_port()
 
 std::string get_loupedeck_file_path()
 {
-	std::string dataFilePath = "";
-	char* buf = nullptr;
-	size_t sz = 0;
+	std::string dataFilePath = getenv(ENV_PREFIX);
 
-	if (_dupenv_s(&buf, &sz, ENV_PREFIX) == 0 && buf != nullptr)
-	{
-		dataFilePath = buf;
-		free(buf);
-	}
-	
 	if (dataFilePath.length() == 0)
 		throw std::runtime_error("Cannot get home directory path");
 
