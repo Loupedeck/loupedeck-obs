@@ -82,10 +82,11 @@ unsigned short get_free_port()
 	#define ENV_PATH "\\Loupedeck\\PluginData\\OBSStudio\\"
 #endif
 
+#define FALLBACK_PORT 4444
+
 #define PORT_FILE "websocket.port"
 
-std::string get_loupedeck_file_path()
-{
+std::string get_loupedeck_file_path(void) {
 	std::string dataFilePath = getenv(ENV_PREFIX);
 
 	if (dataFilePath.length() == 0)
@@ -97,31 +98,31 @@ std::string get_loupedeck_file_path()
 	return dataFilePath;
 }
 
-void save_to_loupedeck(unsigned short port)
-{
+bool save_to_loupedeck(unsigned short port) {
 	try {
 		//Note this thing can throw; 
 		std::string fname = get_loupedeck_file_path().c_str();
 		std::ofstream df(fname, std::ofstream::out);
 
 		blog(LOG_INFO, "Will save to file %s", fname.c_str());
-		if (!df.is_open())
-		{
+		if (!df.is_open()) {
+			blog(LOG_INFO, "Error %s saving to file %s", strerror(errno), fname.c_str());
 			throw std::runtime_error("Cannot share port with Loupedeck, see OBS log for details");
 		}
 		df << port;
-
 		df.close();
 	}
 	catch ( std::exception &ex ) {
 		blog(LOG_ERROR, "Cannot save Loupedeck port to file! Exception: %s", ex.what());
+		return false;
 	}
 	
+	return true;
 }
 
 
 bool obs_module_load(void) {
-	blog(LOG_INFO, "you can haz websockets (version %s)", OBS_WEBSOCKET_VERSION);
+	blog(LOG_INFO, "websockets (version %s) initialized", OBS_WEBSOCKET_VERSION);
 	blog(LOG_INFO, "qt version (compile-time): %s ; qt version (run-time): %s",
 		QT_VERSION_STR, qVersion());
 
@@ -150,7 +151,8 @@ bool obs_module_load(void) {
 	auto eventCallback = [](enum obs_frontend_event event, void *param) {
 		if (event == OBS_FRONTEND_EVENT_FINISHED_LOADING) {
 			_config->ServerPort = get_free_port();
-			save_to_loupedeck(_config->ServerPort);
+			if( !save_to_loupedeck(_config->ServerPort))
+				_config->ServerPort = FALLBACK_PORT;
 			_server->start(_config->ServerPort, _config->LockToIPv4);
 			obs_frontend_remove_event_callback((obs_frontend_event_cb)param, nullptr);
 		}
