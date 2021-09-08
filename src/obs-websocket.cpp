@@ -76,10 +76,10 @@ unsigned short get_free_port()
 
 #ifndef WIN32
 	#define ENV_PREFIX "HOME"
-	#define ENV_PATH "/.local/share/Loupedeck/PluginData/OBSStudio/"
+	#define ENV_PATH "/.local/share/Loupedeck/PluginData/ObsStudio/"
 #else 
 	#define ENV_PREFIX "LOCALAPPDATA"
-	#define ENV_PATH "\\Loupedeck\\PluginData\\OBSStudio\\"
+	#define ENV_PATH "\\Loupedeck\\PluginData\\ObsStudio\\"
 #endif
 
 #define FALLBACK_PORT 4444
