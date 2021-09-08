@@ -3,18 +3,18 @@
 OSTYPE=$(uname)
 
 if [ "${OSTYPE}" != "Darwin" ]; then
-	echo "[obs-websocket - Error] macOS build script can be run on Darwin-type OS only."
+	echo "[loupedeck-obs - Error] macOS build script can be run on Darwin-type OS only."
 	exit 1
 fi
 
 HAS_CMAKE=$(type cmake 2>/dev/null)
 
 if [ "${HAS_CMAKE}" = "" ]; then
-	echo "[obs-websocket - Error] CMake not installed - please run 'install-dependencies-macos.sh' first."
+	echo "[loupedeck-obs - Error] CMake not installed - please run 'install-dependencies-macos.sh' first."
 	exit 1
 fi
 
-echo "[obs-websocket] Building 'obs-websocket' for macOS."
+echo "[loupedeck-obs] Building 'loupedeck-obs' for macOS."
 mkdir -p build && cd build
 cmake .. \
 	-DQTDIR=/tmp/obsdeps \
