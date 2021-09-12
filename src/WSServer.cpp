@@ -19,6 +19,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <chrono>
 #include <thread>
 
+#include <iostream>
+#include <fstream>
+
 #include <QtCore/QThread>
 #include <QtCore/QByteArray>
 #include <QtWidgets/QMainWindow>
@@ -75,8 +78,93 @@ void WSServer::serverRunner()
 	blog(LOG_INFO, "IO thread exited.");
 }
 
+
+#ifndef WIN32
+#define ENV_PREFIX "HOME"
+#define ENV_PATH "/.local/share/Loupedeck/PluginData/ObsStudio/"
+#else
+#define ENV_PREFIX "LOCALAPPDATA"
+#define ENV_PATH "\\Loupedeck\\PluginData\\ObsStudio\\"
+#endif
+
+#define PORT_FILE "websocket.port"
+
+std::string get_port_file_path(void)
+{
+	std::string dataFilePath = getenv(ENV_PREFIX);
+
+	if (dataFilePath.length() == 0)
+		throw std::runtime_error("Cannot get home directory path");
+
+	dataFilePath += ENV_PATH;
+	dataFilePath += PORT_FILE;
+
+	return dataFilePath;
+}
+
+unsigned short get_free_port(void)
+{
+	unsigned short port(0);
+	try {
+		/* https://stackoverflow.com/a/19923459 */
+		asio::io_service service;
+		asio::ip::tcp::acceptor acceptor(service);
+		asio::ip::tcp::endpoint endPoint(asio::ip::tcp::endpoint(asio::ip::tcp::v6(), port));
+		acceptor.open(endPoint.protocol());
+		acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
+		acceptor.bind(endPoint);
+
+		acceptor.listen();
+
+		asio::ip::tcp::endpoint le = acceptor.local_endpoint();
+		port = le.port();
+		//acceptor.close() will be called on exit of this block
+		blog(LOG_INFO, "using port %d", port);
+	}
+	catch (std::exception& ex) {
+		blog(LOG_ERROR, "Cannot obtain a free port! Exception: %s", ex.what());
+	}
+
+	return port;
+}
+
+bool save_port_to_file(unsigned short port)
+{
+	try {
+		std::string fname = get_port_file_path();
+		std::ofstream df(fname, std::ofstream::out);
+
+		blog(LOG_INFO, "Will save to file %s", fname.c_str());
+		if (!df.is_open()) {
+			blog(LOG_INFO, "Error %s saving to file %s", strerror(errno), fname.c_str());
+			throw std::runtime_error(strerror(errno));
+		}
+		df << port;
+		df.close();
+	}
+	catch (std::exception& ex) {
+		blog(LOG_ERROR, "Cannot save Loupedeck port to file! Exception: %s", ex.what());
+		return false;
+	}
+
+	return true;
+}
+
+void remove_port_file(void)
+{
+	std::string fname = get_port_file_path();
+	if (!std::remove(fname.c_str()))
+	{
+		blog(LOG_ERROR, "Cannot remove port file %s", fname.c_str());
+	}
+}
+
+
 void WSServer::start(quint16 port, bool lockToIPv4)
 {
+	//Note that in LD plugin case, server is started once during module load. 
+	//There is no code path leading to restarting the server mid-flight. 
+
 	if (_server.is_listening() && (port == _serverPort && _lockToIPv4 == lockToIPv4)) {
 		blog(LOG_INFO, "WSServer::start: server already on this port and protocol mode. no restart needed");
 		return;
@@ -88,7 +176,14 @@ void WSServer::start(quint16 port, bool lockToIPv4)
 
 	_server.reset();
 
-	_serverPort = port;
+	//LD Plugin case: port will be used only as a fallback;  We use dynamically allocated port.
+	_serverPort = get_free_port();
+
+	if ( (_serverPort == 0) || !save_port_to_file(_serverPort)) {
+		blog(LOG_ERROR, "WSServer::start: Cannot save dynamic port to Loupedeck. Using fallback port %d instead",port);
+		_serverPort = port;
+	}
+
 	_lockToIPv4 = lockToIPv4;
 
 	websocketpp::lib::error_code errorCode;
@@ -105,11 +200,10 @@ void WSServer::start(quint16 port, bool lockToIPv4)
 		blog(LOG_INFO, "server: listen failed: %s", errorCodeMessage.c_str());
 
 		obs_frontend_push_ui_translation(obs_module_get_string);
-		QString errorTitle = "Loupedeck Connector failure"; /* tr("OBSWebsocket.Server.StartFailed.Title");*/
+		QString errorTitle = "Loupedeck Connector failure";
         	QString errorMessage = QString("Loupedeck Connector failed to start.\n"
-					       "Please check https://support.loupedeck.com for possible solution\n"
+					       "Please check https://support.loupedeck.com for possible solutions\n"
 					       "The error message: \"%2\"").arg(errorCodeMessage.c_str());
-      				      /*tr("OBSWebsocket.Server.StartFailed.Message").arg(_serverPort).arg(errorCodeMessage.c_str());*/
 		obs_frontend_pop_ui_translation();
 
 		QMainWindow* mainWindow = reinterpret_cast<QMainWindow*>(obs_frontend_get_main_window());
@@ -132,6 +226,10 @@ void WSServer::stop()
 	}
 
 	_server.stop_listening();
+
+	//LD plugin: Removing port file if it exists
+	remove_port_file();
+
 	for (connection_hdl hdl : _connections) {
 		websocketpp::lib::error_code errorCode;
 		_server.pause_reading(hdl, errorCode);

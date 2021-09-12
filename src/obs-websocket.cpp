@@ -53,74 +53,6 @@ WSServerPtr _server;
 WSEventsPtr _eventsSystem;
 SettingsDialog* settingsDialog = nullptr;
 
-unsigned short get_free_port()
-{
-	/* https://stackoverflow.com/a/19923459 */
-	asio::io_service service;
-	asio::ip::tcp::acceptor acceptor(service);
-	unsigned short port(0);
-	asio::ip::tcp::endpoint endPoint(asio::ip::tcp::endpoint(asio::ip::tcp::v6(), port));
-	acceptor.open(endPoint.protocol());
-	acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
-	acceptor.bind(endPoint);
-
-	acceptor.listen();
-
-	asio::ip::tcp::endpoint le = acceptor.local_endpoint(); 
-	port = le.port();
-
-	blog(LOG_INFO, "using port %d",port);
-
-	return port;
-}
-
-#ifndef WIN32
-	#define ENV_PREFIX "HOME"
-	#define ENV_PATH "/.local/share/Loupedeck/PluginData/ObsStudio/"
-#else 
-	#define ENV_PREFIX "LOCALAPPDATA"
-	#define ENV_PATH "\\Loupedeck\\PluginData\\ObsStudio\\"
-#endif
-
-#define FALLBACK_PORT 4444
-
-#define PORT_FILE "websocket.port"
-
-std::string get_loupedeck_file_path(void) {
-	std::string dataFilePath = getenv(ENV_PREFIX);
-
-	if (dataFilePath.length() == 0)
-		throw std::runtime_error("Cannot get home directory path");
-
-	dataFilePath += ENV_PATH;
-	dataFilePath += PORT_FILE;
-
-	return dataFilePath;
-}
-
-bool save_to_loupedeck(unsigned short port) {
-	try {
-		//Note this thing can throw; 
-		std::string fname = get_loupedeck_file_path().c_str();
-		std::ofstream df(fname, std::ofstream::out);
-
-		blog(LOG_INFO, "Will save to file %s", fname.c_str());
-		if (!df.is_open()) {
-			blog(LOG_INFO, "Error %s saving to file %s", strerror(errno), fname.c_str());
-			throw std::runtime_error("Cannot share port with Loupedeck, see OBS log for details");
-		}
-		df << port;
-		df.close();
-	}
-	catch ( std::exception &ex ) {
-		blog(LOG_ERROR, "Cannot save Loupedeck port to file! Exception: %s", ex.what());
-		return false;
-	}
-	
-	return true;
-}
-
-
 bool obs_module_load(void) {
 	blog(LOG_INFO, "websockets (version %s) initialized", OBS_WEBSOCKET_VERSION);
 	blog(LOG_INFO, "qt version (compile-time): %s ; qt version (run-time): %s",
@@ -150,9 +82,6 @@ bool obs_module_load(void) {
 	// Setup event handler to start the server once OBS is ready
 	auto eventCallback = [](enum obs_frontend_event event, void *param) {
 		if (event == OBS_FRONTEND_EVENT_FINISHED_LOADING) {
-			_config->ServerPort = get_free_port();
-			if( !save_to_loupedeck(_config->ServerPort))
-				_config->ServerPort = FALLBACK_PORT;
 			_server->start(_config->ServerPort, _config->LockToIPv4);
 			obs_frontend_remove_event_callback((obs_frontend_event_cb)param, nullptr);
 		}
