@@ -27,7 +27,6 @@ class Config {
 	public:
 		Config();
 		~Config();
-		config_t* GetConfigStore();
 
 		void SetPassword(QString password);
 		bool CheckAuth(QString userChallenge);
@@ -45,6 +44,5 @@ class Config {
 		QString Secret;
 		QString Salt;
 		QString SessionChallenge;
-		bool SettingsLoaded;
 
 };
