@@ -46,30 +46,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #define QT_TO_UTF8(str) str.toUtf8().constData()
 
 Config::Config() :
-	ServerPort(56873 /*loupe*/),
+	ServerPort(4444),
 	LockToIPv4(false),
-	DebugEnabled(false),
+	DebugEnabled(true),
 	AlertsEnabled(true),
-	AuthRequired(true),
+	AuthRequired(false),
 	Secret(""),
-	Salt(""),
-	SettingsLoaded(false)
+	Salt("")
 {
 	qsrand(QTime::currentTime().msec());
 
-	ServerPort = 56873; /*loupe*/
-	LockToIPv4 = true;
-
-	DebugEnabled = true;
-	AlertsEnabled = true;
-
-	AuthRequired = false;
-	Secret = "Secret";
-	Salt = "Sauce";
-
 	SessionChallenge = GenerateSalt();
-
-
 }
 
 Config::~Config()
