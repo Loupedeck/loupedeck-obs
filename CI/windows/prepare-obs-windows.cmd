@@ -34,4 +34,8 @@ cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION=10.0 -DQTDIR="%QT
 echo:
 echo:
 
-dir "%OBS_PATH%\libobs"
+cd ..
+echo Building OBS
+make --build build32 --config %build_config%
+make --build build64 --config %build_config%
+

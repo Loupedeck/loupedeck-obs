@@ -1,4 +1,4 @@
-set LD_OBS_CONNECTOR_ROOT=C:\source\obs_ci
+set LD_OBS_CONNECTOR_ROOT=C:\source\obs
 set build_config=Release
 
 set DEPS_BASE_PATH=%LD_OBS_CONNECTOR_ROOT%\deps
