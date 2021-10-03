@@ -64,6 +64,14 @@ bool obs_module_load(void) {
 	_server = WSServerPtr(new WSServer());
 	_eventsSystem = WSEventsPtr(new WSEvents(_server));
 
+//Prevent OBS Websocket from running
+	{
+		config_t* obsConfig = obs_frontend_get_profile_config();
+		config_set_bool(obsConfig, "WebsocketAPI", "ServerEnabled", false);
+		config_save(obsConfig);
+	}
+
+
 	// UI setup
 	obs_frontend_push_ui_translation(obs_module_get_string);
 	QMainWindow* mainWindow = (QMainWindow*)obs_frontend_get_main_window();
@@ -81,7 +89,9 @@ bool obs_module_load(void) {
 
 	// Setup event handler to start the server once OBS is ready
 	auto eventCallback = [](enum obs_frontend_event event, void *param) {
+		blog(LOG_INFO, "event callback:%d", event);		
 		if (event == OBS_FRONTEND_EVENT_FINISHED_LOADING) {
+			blog(LOG_INFO, "FINISHED LOADING");
 			_server->start(_config->ServerPort, _config->LockToIPv4);
 			obs_frontend_remove_event_callback((obs_frontend_event_cb)param, nullptr);
 		}
