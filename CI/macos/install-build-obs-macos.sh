@@ -23,12 +23,21 @@ fi
 # Build obs-studio
 cd ..
 echo "[loupedeck-obs] Cloning obs-studio from GitHub.."
-git clone https://github.com/obsproject/obs-studio
+if [ ! -d "obs-studio" ] ; then 
+	git clone https://github.com/obsproject/obs-studio
+fi
+
 cd obs-studio
 OBSLatestTag=27.0.1
 # $(git describe --tags --abbrev=0)
 
 git checkout $OBSLatestTag
+
+if [ -d "build" ] ; then
+	echo Removing build directory
+	rm -rf build
+fi
+
 mkdir build && cd build
 echo "[loupedeck-obs] Building obs-studio.."
 cmake .. \
@@ -39,3 +48,4 @@ cmake .. \
 	-DENABLE_SCRIPTING=0 \
 	-DCMAKE_PREFIX_PATH=/tmp/obsdeps/lib/cmake \
 && make -j4
+
