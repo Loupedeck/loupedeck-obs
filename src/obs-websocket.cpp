@@ -65,19 +65,6 @@ bool obs_module_load(void) {
 	_eventsSystem = WSEventsPtr(new WSEvents(_server));
 
 
-	
-#ifndef _WIN32
-	//Prevent OBS Websocket from running
-	{
-		config_t* obsConfig = obs_frontend_get_profile_config();
-		if(config_get_bool(obsConfig, "WebsocketAPI", "ServerEnabled"))
-		{
-			config_set_bool(obsConfig, "WebsocketAPI", "ServerEnabled", false);
-			config_save(obsConfig);
-		}
-	}
-#endif
-
 	// UI setup
 	obs_frontend_push_ui_translation(obs_module_get_string);
 	QMainWindow* mainWindow = (QMainWindow*)obs_frontend_get_main_window();
