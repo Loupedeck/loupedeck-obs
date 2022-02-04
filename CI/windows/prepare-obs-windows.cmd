@@ -36,6 +36,6 @@ echo:
 
 cd ..
 echo Building OBS
-make --build build32 --config %build_config%
-make --build build64 --config %build_config%
+cmake --build build32 --config %build_config%
+cmake --build build64 --config %build_config%
 
