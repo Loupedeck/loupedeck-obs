@@ -30,6 +30,8 @@ RpcRequest::RpcRequest(const QString& messageId, const QString& methodName, obs_
 	}
 }
 
+RpcRequest::RpcRequest(const RpcRequest& that) : RpcRequest(that._messageId, that._methodName, (obs_data_t*)(that._parameters)) {};
+
 const RpcResponse RpcRequest::success(obs_data_t* additionalFields) const
 {
 	return RpcResponse::ok(*this, additionalFields);
