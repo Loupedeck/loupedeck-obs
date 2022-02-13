@@ -109,7 +109,9 @@ unsigned short get_free_port(void)
 		/* https://stackoverflow.com/a/19923459 */
 		asio::io_service service;
 		asio::ip::tcp::acceptor acceptor(service);
-		asio::ip::tcp::endpoint endPoint(asio::ip::tcp::endpoint(asio::ip::tcp::v6(), port));
+		/* https://stackoverflow.com/questions/34562824 */
+		asio::ip::tcp::endpoint endPoint(asio::ip::tcp::endpoint(asio::ip::address::from_string("127.0.0.1"), port));
+
 		acceptor.open(endPoint.protocol());
 		acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
 		acceptor.bind(endPoint);
@@ -189,9 +191,11 @@ void WSServer::start(quint16 port, bool lockToIPv4)
 	websocketpp::lib::error_code errorCode;
 	if (lockToIPv4) {
 		blog(LOG_INFO, "WSServer::start: Locked to IPv4 bindings");
-		_server.listen(websocketpp::lib::asio::ip::tcp::v4(), _serverPort, errorCode);
+		// listening only on localhost
+		_server.listen(websocketpp::lib::asio::ip::address::from_string("127.0.0.1"), _serverPort, errorCode);
 	} else {
 		blog(LOG_INFO, "WSServer::start: Not locked to IPv4 bindings");
+		//Also listening on all interfaces.
 		_server.listen(_serverPort, errorCode);
 	}
 
