@@ -6,5 +6,5 @@ echo If you did not, please exit at this stage, otherwise please continue
 call CI\windows\settings.cmd
 pause
 call CI\windows\prepare-plugin-windows.cmd 
-cmake --build build32 --config %build_config%
+rem cmake --build build32 --config %build_config%
 cmake --build build64 --config %build_config%
