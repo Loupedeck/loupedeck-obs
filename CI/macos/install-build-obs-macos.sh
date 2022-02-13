@@ -28,7 +28,7 @@ if [ ! -d "obs-studio" ] ; then
 fi
 
 cd obs-studio
-OBSLatestTag=27.0.1
+OBSLatestTag=27.1.3
 # $(git describe --tags --abbrev=0)
 
 git checkout $OBSLatestTag
