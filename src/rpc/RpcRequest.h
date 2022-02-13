@@ -30,8 +30,6 @@ class RpcRequest
 public:
 	explicit RpcRequest(const QString& messageId, const QString& methodName, obs_data_t* params);
 	
-	explicit RpcRequest(const RpcRequest& that);
-
 	const QString& messageId() const
 	{
 		return _messageId;
