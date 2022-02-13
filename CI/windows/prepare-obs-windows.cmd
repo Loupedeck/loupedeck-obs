@@ -8,11 +8,12 @@ if not exist %OBS_PATH% (
     cd /D %OBS_PATH%\
     git describe --tags --abbrev=0 > "%OBS_PATH%\obs-studio-latest-tag.txt"
     set /p OBS_LATEST_TAG=<"%OBS_PATH%\obs-studio-latest-tag.txt"
-)
 
+)
 REM Prepare OBS Studio builds
 
-echo Running CMake...,  obs path is %OBS_PATH%
+set OBS_LATEST_TAG="27.1.3"
+echo Running CMake...,  obs path is %OBS_PATH%, using tag %OBS_LATEST_TAG%
 cd /D %OBS_PATH%
 echo   git checkout %OBS_LATEST_TAG%
 git checkout %OBS_LATEST_TAG%
