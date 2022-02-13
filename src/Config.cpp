@@ -47,7 +47,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 Config::Config() :
 	ServerPort(4444),
-	LockToIPv4(false),
+	LockToIPv4(true),
 	DebugEnabled(true),
 	AlertsEnabled(true),
 	AuthRequired(false),
