@@ -10,5 +10,5 @@ pause
 
 call CI\windows\prepare-plugin-windows.cmd 
 
-cmake --build build32 --config %build_config%
+rem cmake --build build32 --config %build_config%
 cmake --build build64 --config %build_config%

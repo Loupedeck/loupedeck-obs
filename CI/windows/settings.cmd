@@ -1,6 +1,6 @@
 set LD_OBS_CONNECTOR_ROOT=C:\source\obs
 set build_config=Release
-
+rem set build_config=Debug
 set DEPS_BASE_PATH=%LD_OBS_CONNECTOR_ROOT%\deps
 set QT_BASE_DIR=%LD_OBS_CONNECTOR_ROOT%\qt
 set OBS_PATH=%LD_OBS_CONNECTOR_ROOT%\obs

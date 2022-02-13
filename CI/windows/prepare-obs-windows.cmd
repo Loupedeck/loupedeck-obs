@@ -1,4 +1,3 @@
-
 @echo off
 SETLOCAL EnableDelayedExpansion
 
@@ -13,7 +12,7 @@ if not exist %OBS_PATH% (
 
 REM Prepare OBS Studio builds
 
-echo Running CMake...
+echo Running CMake...,  obs path is %OBS_PATH%
 cd /D %OBS_PATH%
 echo   git checkout %OBS_LATEST_TAG%
 git checkout %OBS_LATEST_TAG%
@@ -22,11 +21,11 @@ echo:
 if not exist build32 mkdir build32
 if not exist build64 mkdir build64
 
-echo   Running cmake for obs-studio %OBS_LATEST_TAG% 32-bit...
+rem echo   Running cmake for obs-studio %OBS_LATEST_TAG% 32-bit...
 cd build32
-cmake -G "Visual Studio 16 2019" -A Win32 -DCMAKE_SYSTEM_VERSION=10.0 -DQTDIR="%QTDIR32%" -DDepsPath="%DEPS_PATH_32%" -DDISABLE_PLUGINS=true -DCOPIED_DEPENDENCIES=false -DCOPY_DEPENDENCIES=true ..
-echo:
-echo:
+rem cmake -G "Visual Studio 16 2019" -A Win32 -DCMAKE_SYSTEM_VERSION=10.0 -DQTDIR="%QTDIR32%" -DDepsPath="%DEPS_PATH_32%" -DDISABLE_PLUGINS=true -DCOPIED_DEPENDENCIES=false -DCOPY_DEPENDENCIES=true ..
+rem echo:
+rem echo:
 
 echo   Running cmake for obs-studio %OBS_LATEST_TAG% 64-bit...
 cd ..\build64
@@ -36,6 +35,6 @@ echo:
 
 cd ..
 echo Building OBS
-cmake --build build32 --config %build_config%
+rem cmake --build build32 --config %build_config%
 cmake --build build64 --config %build_config%
 
