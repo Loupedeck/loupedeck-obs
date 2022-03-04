@@ -130,11 +130,22 @@ unsigned short get_free_port(void)
 	return port;
 }
 
+void remove_port_file(void)
+{
+	std::string fname = get_port_file_path();
+	if (!std::remove(fname.c_str()))
+	{
+		blog(LOG_ERROR, "Cannot remove port file %s", fname.c_str());
+	}
+}
+
 bool save_port_to_file(unsigned short port)
 {
 	try {
 		std::string fname = get_port_file_path();
 		std::ofstream df(fname, std::ofstream::out);
+
+	        remove_port_file();
 
 		blog(LOG_INFO, "Will save to file %s", fname.c_str());
 		if (!df.is_open()) {
@@ -151,16 +162,6 @@ bool save_port_to_file(unsigned short port)
 
 	return true;
 }
-
-void remove_port_file(void)
-{
-	std::string fname = get_port_file_path();
-	if (!std::remove(fname.c_str()))
-	{
-		blog(LOG_ERROR, "Cannot remove port file %s", fname.c_str());
-	}
-}
-
 
 void WSServer::start(quint16 port, bool lockToIPv4)
 {
@@ -181,8 +182,8 @@ void WSServer::start(quint16 port, bool lockToIPv4)
 	//LD Plugin case: port will be used only as a fallback;  We use dynamically allocated port.
 	_serverPort = get_free_port();
 
-	if ( (_serverPort == 0) || !save_port_to_file(_serverPort)) {
-		blog(LOG_ERROR, "WSServer::start: Cannot save dynamic port to Loupedeck. Using fallback port %d instead",port);
+	if ( _serverPort == 0 ) {
+		blog(LOG_ERROR, "WSServer::start: Cannot use dynamic port with Loupedeck. Using fallback port %d instead",port);
 		_serverPort = port;
 	}
 
@@ -221,6 +222,12 @@ void WSServer::start(quint16 port, bool lockToIPv4)
 	_serverThread = std::thread(&WSServer::serverRunner, this);
 
 	blog(LOG_INFO, "server started successfully on port %d", _serverPort);
+
+	if (!save_port_to_file(_serverPort)) {
+		blog(LOG_ERROR, "WSServer::start: Cannot save dynamic port to Loupedeck!" );
+	}
+
+
 }
 
 void WSServer::stop()
