@@ -142,10 +142,10 @@ void remove_port_file(void)
 bool save_port_to_file(unsigned short port)
 {
 	try {
+	        remove_port_file();
+
 		std::string fname = get_port_file_path();
 		std::ofstream df(fname, std::ofstream::out);
-
-	        remove_port_file();
 
 		blog(LOG_INFO, "Will save to file %s", fname.c_str());
 		if (!df.is_open()) {
