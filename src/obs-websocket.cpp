@@ -20,9 +20,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <obs-frontend-api.h>
 #include <obs-data.h>
 
-#include <QtCore/QTimer>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QMainWindow>
+#include <QTimer>
+#include <QAction>
+#include <QMainWindow>
 
 #include "obs-websocket.h"
 #include "WSServer.h"
@@ -30,23 +30,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "Config.h"
 #include "forms/settings-dialog.h"
 
-#include <iostream>
-#include <fstream>
-
-
-void ___source_dummy_addref(obs_source_t*) {}
-void ___sceneitem_dummy_addref(obs_sceneitem_t*) {}
-void ___data_dummy_addref(obs_data_t*) {}
-void ___data_array_dummy_addref(obs_data_array_t*) {}
-void ___output_dummy_addref(obs_output_t*) {}
-
 void ___data_item_dummy_addref(obs_data_item_t*) {}
 void ___data_item_release(obs_data_item_t* dataItem) {
 	obs_data_item_release(&dataItem);
 }
 
 OBS_DECLARE_MODULE()
-OBS_MODULE_USE_DEFAULT_LOCALE("loupedeck-obs", "en-US")
+OBS_MODULE_USE_DEFAULT_LOCALE("obs-websocket", "en-US")
 
 ConfigPtr _config;
 WSServerPtr _server;
@@ -54,16 +44,18 @@ WSEventsPtr _eventsSystem;
 SettingsDialog* settingsDialog = nullptr;
 
 bool obs_module_load(void) {
-	blog(LOG_INFO, "loupedeck-obs based on websockets (version %s) initialized", OBS_WEBSOCKET_VERSION);
+	blog(LOG_INFO, "you can haz websockets (version %s)", OBS_WEBSOCKET_VERSION);
 	blog(LOG_INFO, "qt version (compile-time): %s ; qt version (run-time): %s",
 		QT_VERSION_STR, qVersion());
+	blog(LOG_INFO, "[obs_module_load] Linked ASIO Version: %d", ASIO_VERSION);
 
 	// Core setup
 	_config = ConfigPtr(new Config());
+	_config->MigrateFromGlobalSettings(); // TODO remove this on the next minor jump
+	_config->Load();
 
 	_server = WSServerPtr(new WSServer());
 	_eventsSystem = WSEventsPtr(new WSEvents(_server));
-
 
 	// UI setup
 	obs_frontend_push_ui_translation(obs_module_get_string);
@@ -71,7 +63,8 @@ bool obs_module_load(void) {
 	settingsDialog = new SettingsDialog(mainWindow);
 	obs_frontend_pop_ui_translation();
 
-	const char* menuActionText = "Loupedeck Connector";
+	const char* menuActionText =
+		obs_module_text("OBSWebsocketCompat.Settings.DialogTitle");
 	QAction* menuAction =
 		(QAction*)obs_frontend_add_tools_menu_qaction(menuActionText);
 	QObject::connect(menuAction, &QAction::triggered, [] {
@@ -83,7 +76,9 @@ bool obs_module_load(void) {
 	// Setup event handler to start the server once OBS is ready
 	auto eventCallback = [](enum obs_frontend_event event, void *param) {
 		if (event == OBS_FRONTEND_EVENT_FINISHED_LOADING) {
-			_server->start(_config->ServerPort, _config->LockToIPv4);
+			if (_config->ServerEnabled) {
+				_server->start(_config->ServerPort, _config->LockToIPv4);
+			}
 			obs_frontend_remove_event_callback((obs_frontend_event_cb)param, nullptr);
 		}
 	};
@@ -119,6 +114,7 @@ WSEventsPtr GetEventsSystem() {
 
 void ShowPasswordSetting() {
 	if (settingsDialog) {
+		settingsDialog->PreparePasswordEntry();
 		settingsDialog->setVisible(true);
 	}
 }

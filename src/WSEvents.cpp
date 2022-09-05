@@ -21,7 +21,7 @@
 #include <util/platform.h>
 #include <media-io/video-io.h>
 
-#include <QtWidgets/QPushButton>
+#include <QPushButton>
 
 #include "WSEvents.h"
 
@@ -252,14 +252,14 @@ void WSEvents::broadcastUpdate(const char* updateType,
 	if (!_srv->isListening()) {
 		return;
 	}
-	std::optional<uint64_t> streamTime;
+	uint64_t streamTime = 0;
 	if (obs_frontend_streaming_active()) {
-		streamTime = std::make_optional(getStreamingTime());
+		streamTime = getStreamingTime();
 	}
 
-	std::optional<uint64_t> recordingTime;
+	uint64_t recordingTime;
 	if (obs_frontend_recording_active()) {
-		recordingTime = std::make_optional(getRecordingTime());
+		recordingTime = getRecordingTime();
 	}
 
 	RpcEvent event(QString(updateType), streamTime, recordingTime, additionalFields);
@@ -610,8 +610,10 @@ void WSEvents::OnTransitionListChange() {
  */
 void WSEvents::OnProfileChange() {
 	OBSDataAutoRelease fields = obs_data_create();
-	obs_data_set_string(fields, "profile", obs_frontend_get_current_profile());
+	char *profile = obs_frontend_get_current_profile();
+	obs_data_set_string(fields, "profile", profile);
 	broadcastUpdate("ProfileChanged", fields);
+	bfree(profile);
 }
 
 /**

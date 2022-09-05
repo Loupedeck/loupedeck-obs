@@ -17,9 +17,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
 #include <inttypes.h>
-#include <QtWidgets/QMainWindow>
-#include <QtCore/QDir>
-#include <QtCore/QUrl>
+#include <QMainWindow>
+#include <QDir>
+#include <QUrl>
 
 #include <obs-frontend-api.h>
 #include <obs.hpp>
@@ -378,8 +378,7 @@ obs_source_t* Utils::GetTransitionFromName(QString searchName) {
 		QString transitionName = obs_source_get_name(transition);
 
 		if (transitionName == searchName) {
-			foundTransition = transition;
-			obs_source_addref(foundTransition);
+			foundTransition = obs_source_get_ref(transition);
 			break;
 		}
 	}
