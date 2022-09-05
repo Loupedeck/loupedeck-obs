@@ -78,6 +78,6 @@
             "qtVersion": 6
         }
     },
-    "name": "obs-websocket-compat",
+    "name": "loupedeck-obs-compat",
     "version": "4.9.1"
 }

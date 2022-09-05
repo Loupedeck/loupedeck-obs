@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16...3.21)
 
-project(obs-websocket-compat VERSION 4.9.1)
+project(loupedeck-obs-compat VERSION 4.9.1)
 add_library(${CMAKE_PROJECT_NAME} MODULE)
 
 set(PLUGIN_AUTHOR "OBS Project")
@@ -9,7 +9,7 @@ set(MACOS_BUNDLEID "com.obsproject.${CMAKE_PROJECT_NAME}")
 
 set(LINUX_MAINTAINER_EMAIL "tt2468@irltoolkit.com")
 
-target_compile_definitions(obs-websocket-compat PRIVATE ASIO_STANDALONE)
+target_compile_definitions(loupedeck-obs-compat PRIVATE ASIO_STANDALONE)
 
 target_sources(
   ${CMAKE_PROJECT_NAME}
@@ -53,7 +53,7 @@ target_sources(
           src/forms/settings-dialog.h)
 
 target_include_directories(
-  obs-websocket-compat PRIVATE ${CMAKE_SOURCE_DIR}/deps/asio/asio/include
+  loupedeck-obs-compat PRIVATE ${CMAKE_SOURCE_DIR}/deps/asio/asio/include
                                ${CMAKE_SOURCE_DIR}/deps/websocketpp)
 
 # /!\ TAKE NOTE: No need to edit things past this point /!\

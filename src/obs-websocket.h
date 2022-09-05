@@ -42,4 +42,4 @@ void ShowPasswordSetting();
 
 #define OBS_WEBSOCKET_VERSION "4.9.1-compat"
 
-#define blog(level, msg, ...) blog(level, "[obs-websocket 4.9.1-compat] " msg, ##__VA_ARGS__)
+#define blog(level, msg, ...) blog(level, "[loupedeck-obs] " msg, ##__VA_ARGS__)

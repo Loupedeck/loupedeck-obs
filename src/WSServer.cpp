@@ -15,18 +15,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
-
 #include <chrono>
 #include <thread>
 
 #include <iostream>
 #include <fstream>
 
-#include <QtCore/QThread>
-#include <QtCore/QByteArray>
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMessageBox>
+#include <QThread>
+#include <QByteArray>
+#include <QMainWindow>
+#include <QMessageBox>
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
 #include <QtConcurrent/QtConcurrent>
+#endif
 #include <obs-frontend-api.h>
 #include <util/platform.h>
 
@@ -44,8 +45,12 @@ using websocketpp::lib::bind;
 
 WSServer::WSServer()
 	: QObject(nullptr),
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
 	  _connections(),
 	  _clMutex(QMutex::Recursive)
+#else
+	  _connections()
+#endif
 {
 		_server.get_alog().clear_channels(websocketpp::log::alevel::frame_header | websocketpp::log::alevel::frame_payload | websocketpp::log::alevel::control);
 	_server.init_asio();
@@ -327,7 +332,11 @@ void WSServer::onMessage(connection_hdl hdl, server::message_ptr message)
 		return;
 	}
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
 	QtConcurrent::run(&_threadPool, [=]() {
+#else
+	_threadPool.start([=]() {
+#endif
 		std::string payload = message->get_payload();
 
 		QMutexLocker locker(&_clMutex);

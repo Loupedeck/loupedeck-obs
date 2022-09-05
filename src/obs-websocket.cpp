@@ -36,7 +36,7 @@ void ___data_item_release(obs_data_item_t* dataItem) {
 }
 
 OBS_DECLARE_MODULE()
-OBS_MODULE_USE_DEFAULT_LOCALE("obs-websocket", "en-US")
+OBS_MODULE_USE_DEFAULT_LOCALE("loupedeck-obs", "en-US")
 
 ConfigPtr _config;
 WSServerPtr _server;
@@ -44,18 +44,16 @@ WSEventsPtr _eventsSystem;
 SettingsDialog* settingsDialog = nullptr;
 
 bool obs_module_load(void) {
-	blog(LOG_INFO, "you can haz websockets (version %s)", OBS_WEBSOCKET_VERSION);
+	blog(LOG_INFO, "loupedeck-obs based on websockets (version %s) initialized", OBS_WEBSOCKET_VERSION);
 	blog(LOG_INFO, "qt version (compile-time): %s ; qt version (run-time): %s",
 		QT_VERSION_STR, qVersion());
-	blog(LOG_INFO, "[obs_module_load] Linked ASIO Version: %d", ASIO_VERSION);
 
 	// Core setup
 	_config = ConfigPtr(new Config());
-	_config->MigrateFromGlobalSettings(); // TODO remove this on the next minor jump
-	_config->Load();
 
 	_server = WSServerPtr(new WSServer());
 	_eventsSystem = WSEventsPtr(new WSEvents(_server));
+
 
 	// UI setup
 	obs_frontend_push_ui_translation(obs_module_get_string);
@@ -63,8 +61,7 @@ bool obs_module_load(void) {
 	settingsDialog = new SettingsDialog(mainWindow);
 	obs_frontend_pop_ui_translation();
 
-	const char* menuActionText =
-		obs_module_text("OBSWebsocketCompat.Settings.DialogTitle");
+	const char* menuActionText = "Loupedeck Connector";
 	QAction* menuAction =
 		(QAction*)obs_frontend_add_tools_menu_qaction(menuActionText);
 	QObject::connect(menuAction, &QAction::triggered, [] {
@@ -76,9 +73,7 @@ bool obs_module_load(void) {
 	// Setup event handler to start the server once OBS is ready
 	auto eventCallback = [](enum obs_frontend_event event, void *param) {
 		if (event == OBS_FRONTEND_EVENT_FINISHED_LOADING) {
-			if (_config->ServerEnabled) {
-				_server->start(_config->ServerPort, _config->LockToIPv4);
-			}
+			_server->start(_config->ServerPort, _config->LockToIPv4);
 			obs_frontend_remove_event_callback((obs_frontend_event_cb)param, nullptr);
 		}
 	};
@@ -114,7 +109,6 @@ WSEventsPtr GetEventsSystem() {
 
 void ShowPasswordSetting() {
 	if (settingsDialog) {
-		settingsDialog->PreparePasswordEntry();
 		settingsDialog->setVisible(true);
 	}
 }
