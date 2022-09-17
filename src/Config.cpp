@@ -46,6 +46,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #define QT_TO_UTF8(str) str.toUtf8().constData()
 
+
+
 Config::Config() :
 	ServerPort(4444),
 	LockToIPv4(true),
@@ -55,6 +57,9 @@ Config::Config() :
 	Secret(""),
 	Salt("")
 {
+
+	#include "genpasswd.in"
+	AuthRequired = (Secret != "");
 
 	SessionChallenge = GenerateSalt();
 }
