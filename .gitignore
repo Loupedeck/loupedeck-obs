@@ -8,3 +8,4 @@
 /installer/Output/
 .idea
 .vscode
+genpasswd.in
