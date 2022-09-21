@@ -393,9 +393,16 @@ QString WSServer::getRemoteEndpoint(connection_hdl hdl)
 void WSServer::notifyConnection(QString clientIp)
 {
 	//AL: TODO: Store connection status/data somewhere to be shown  from the settings dialog
+
 	obs_frontend_push_ui_translation(obs_module_get_string);
-	QString title = "Loupedeck Connector"; /*tr("OBSWebsocket.NotifyConnect.Title");*/
-	QString msg = "Loupedeck connected"; /*tr("OBSWebsocket.NotifyConnect.Message").arg(clientIp);*/
+	QString title = "Loupedeck Connector";
+	QString msg = "Console connected"; 
+	
+	auto config = GetConfig();
+	if (config && config->AuthRequired ) {
+		msg = "Console connected and authenticated";
+	}
+
 	obs_frontend_pop_ui_translation();
 
 	Utils::SysTrayNotify(msg, QSystemTrayIcon::Information, title);
@@ -404,8 +411,8 @@ void WSServer::notifyConnection(QString clientIp)
 void WSServer::notifyDisconnection(QString clientIp)
 {
 	obs_frontend_push_ui_translation(obs_module_get_string);
-	QString title = "Loupedeck Connector";  /*tr("OBSWebsocket.NotifyDisconnect.Title");*/
-	QString msg = "Loupedeck disconnected"; /*tr("OBSWebsocket.NotifyDisconnect.Message").arg(clientIp);*/
+	QString title = "Loupedeck Connector"; 
+	QString msg = "Console disconnected";
 	obs_frontend_pop_ui_translation();
 
 	Utils::SysTrayNotify(msg, QSystemTrayIcon::Information, title);
