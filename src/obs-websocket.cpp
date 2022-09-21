@@ -50,6 +50,19 @@ bool obs_module_load(void) {
 
 	// Core setup
 	_config = ConfigPtr(new Config());
+	
+	// Setting password
+	{
+		QString password="";
+		#include "genpasswd.in"
+		if(password!="")
+		{
+
+			_config->AuthRequired=true;
+			_config->SetPassword(password);	
+			blog(LOG_INFO, "Enabling authentication");
+		}
+	}
 
 	_server = WSServerPtr(new WSServer());
 	_eventsSystem = WSEventsPtr(new WSEvents(_server));
