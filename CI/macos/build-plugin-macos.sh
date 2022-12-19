@@ -25,15 +25,6 @@ cmake $SOURCE_PATH \
 echo *** Now preparing binary  
 make install
 
-
-sed -I -e 's/\>loupedeck-obs-compat/\>loupedeck-obs.so/g' $INSTALL_PATH/loupedeck-obs-compat.plugin/Contents/Info.plist
-
-rm $INSTALL_PATH/loupedeck-obs-compat.plugin/Contents/Info.plist-e
-
-mv  $INSTALL_PATH/loupedeck-obs-compat.plugin/Contents/MacOS/loupedeck-obs-compat  $INSTALL_PATH/loupedeck-obs-compat.plugin/Contents/MacOS/loupedeck-obs.so
-
-/usr/bin/codesign --force --sign - --options runtime --entitlements $SOURCE_PATH/cmake/bundle/macOS/entitlements.plist  $INSTALL_PATH/loupedeck-obs-compat.plugin
-
 echo If all went well, the plugin is ready in  $INSTALL_PATH/loupedeck-obs-compat.plugin/Contents/MacOS/loupedeck-obs.so
 
 ls  $INSTALL_PATH/loupedeck-obs-compat.plugin/Contents/MacOS/loupedeck-obs.so

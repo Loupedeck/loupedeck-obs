@@ -5,7 +5,7 @@ add_library(${CMAKE_PROJECT_NAME} MODULE)
 
 set(PLUGIN_AUTHOR "OBS Project")
 
-set(MACOS_BUNDLEID "com.obsproject.${CMAKE_PROJECT_NAME}")
+set(MACOS_BUNDLEID "com.loupedeck.${CMAKE_PROJECT_NAME}")
 
 set(LINUX_MAINTAINER_EMAIL "tt2468@irltoolkit.com")
 
